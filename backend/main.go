@@ -1,65 +1,56 @@
 package main
 
 import (
+	"backend/config"
+	"backend/models"
+	"backend/routes"
 	"fmt"
+	"log"
+	"os"
 
-	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var db *gorm.DB
-var err error
-
-type User struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
 
 func main() {
-	// DBへ接続
-	dsn := "host=db user=user password=password dbname=mydb port=5432 sslmode=disable"
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// 環境変数の読み込み
+	err := config.LoadEnv()
 	if err != nil {
-		fmt.Println("Failed to connect to the database")
+		log.Fatalf("環境変数の読み込みに失敗しました: %v", err)
 	}
 
-	// マイグレーション
-	db.AutoMigrate(&User{})
+	// DBの接続
+	db, err = config.InitDB()
+	if err != nil {
+		log.Fatalf("データベース接続エラー: %v", err)
+	}
 
+	// マイグレーションを実行（テーブル作成）
+	fmt.Println("マイグレーションを実行中...")
+	err = db.AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal("マイグレーション失敗:", err)
+	}
+
+	fmt.Println("マイグレーション完了！")
+
+	// Gin ルーターを作成
 	r := gin.Default()
 
-	r.Use(cors.Default())
+	// ルーティングの設定
+	routes.SetupRoutes(r, db)
 
-	// シンプルなAPI
-	r.GET("/api/users", func(c *gin.Context) {
-		var users []User
-		if err := db.Find(&users).Error; err != nil {
-			c.JSON(500, gin.H{"message": "Faild to fetch users"})
+	// ポート番号の取得
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-			return
-		}
-
-		c.JSON(200, users)
-	})
-
-	r.POST("/api/users", func(c *gin.Context) {
-		var user User
-		if err := c.ShouldBindJSON(&user); err != nil {
-			c.JSON(400, gin.H{"message": "Invalid input"})
-
-			return
-		}
-		if err := db.Create(&user).Error; err != nil {
-			c.JSON(500, gin.H{"message": "Failed to create user"})
-
-			return
-		}
-		c.JSON(201, user)
-	})
-
-	// 8080ポートで起動
-	r.Run(":8080")
+	// サーバーの起動
+	fmt.Println("Server is running on port", port)
+	if err := r.Run(":" + port); err != nil {
+		log.Fatalf("サーバー起動エラー: %v", err)
+	}
 }

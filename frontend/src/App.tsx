@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-
-interface User {
-  id: number;
-  name: string;
-  age: number;
-}
+import { User } from "./types/user";
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
