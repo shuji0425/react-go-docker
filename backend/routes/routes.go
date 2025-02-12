@@ -15,5 +15,4 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	// POST用
 	userCommandController := controllers.NewUserCommandController(db)
 	r.POST("api/users", userCommandController.CreateUser)
-
 }

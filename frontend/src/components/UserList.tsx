@@ -29,7 +29,8 @@ const UserList: React.FC = () => {
       <ul>
         {users.map(user => (
           <li key={user.id}>
-            {user.name} - {user.age} years old <br />
+            Name: {user.name} <br />
+            Age:  {user.age} years old <br />
             Email:{user.email}
           </li>
         ))}
