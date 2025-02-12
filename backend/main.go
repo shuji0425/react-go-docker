@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -38,6 +39,9 @@ func main() {
 
 	// Gin ルーターを作成
 	r := gin.Default()
+
+	// CORS設定
+	r.Use(cors.Default())
 
 	// ルーティングの設定
 	routes.SetupRoutes(r, db)
