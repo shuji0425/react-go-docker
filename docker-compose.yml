@@ -17,6 +17,7 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app/frontend
+      - /app/frontend/node_modules
     image: frontend-react
     command: ["npm", "run", "dev"]
     depends_on:
