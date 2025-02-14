@@ -14,4 +14,7 @@ COPY . .
 # airをインストール
 RUN go install github.com/air-verse/air@latest
 
+# ビルド
+RUN go build -o main .
+
 CMD ["air"]
