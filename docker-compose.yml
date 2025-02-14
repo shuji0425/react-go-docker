@@ -7,6 +7,10 @@ services:
       - "8080:8080"
     volumes:
       - ./backend:/app/backend
+    image: backend-go
+    command: air
+    environment:
+      - GIN_MODE=debug
     depends_on:
       - db
 
@@ -16,6 +20,8 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    image: frontend-react
     command: ["npm", "run", "dev"]
     depends_on:
       - backend
