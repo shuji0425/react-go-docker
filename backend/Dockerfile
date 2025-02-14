@@ -2,7 +2,7 @@
 FROM golang:1.23
 
 # 作業ディレクトリ
-WORKDIR /app
+WORKDIR /app/backend
 
 # モジュールのキャッシュ
 COPY go.mod go.sum ./
@@ -11,8 +11,7 @@ RUN go mod download
 # ソースのコピー
 COPY . .
 
-# ビルド
-RUN go build -o main .
+# airをインストール
+RUN go install github.com/air-verse/air@latest
 
-# アプリを実行
-CMD ["./main"]
+CMD ["air"]

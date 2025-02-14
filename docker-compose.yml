@@ -8,6 +8,9 @@ services:
     volumes:
       - ./backend:/app/backend
     image: backend-go
+    command: air
+    environment:
+      - GIN_MODE=debug
     depends_on:
       - db
 
