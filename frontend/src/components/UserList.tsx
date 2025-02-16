@@ -9,12 +9,12 @@ const UserList: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/users")
+      .get<User[]>("http://localhost:8080/users")
       .then((response) => {
         setUsers(response.data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         setError("ユーザー情報の取得に失敗しました");
         setLoading(false);
       });
@@ -26,15 +26,19 @@ const UserList: React.FC = () => {
   return (
     <div>
       <h1>ユーザー一覧</h1>
-      <ul>
-        {users.map(user => (
-          <li key={user.id}>
-            Name: {user.name} <br />
-            Age:  {user.age} years old <br />
-            Email:{user.email}
-          </li>
-        ))}
-      </ul>
+      {users.length === 0 ? (
+        <p>ユーザーを登録してください</p>
+      ) : (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              Name: {user.name} <br />
+              Age: {user.age} years old <br />
+              Email:{user.email}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

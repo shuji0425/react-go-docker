@@ -2,9 +2,11 @@ package main
 
 import (
 	"backend/config"
+	"backend/controllers"
 	"backend/middlewares"
 	"backend/models"
 	"backend/routes"
+	"backend/services"
 	"fmt"
 	"log"
 	"os"
@@ -43,8 +45,12 @@ func main() {
 	// CORS設定
 	middlewares.SetupCORS(r)
 
+	// サービスを初期化
+	userService := &services.UserService{DB: db}
+	// コントローラーを初期化
+	controller := controllers.NewControllers(*userService)
 	// ルーティングの設定
-	routes.SetupRoutes(r, db)
+	routes.SetupRoutes(r, controller)
 
 	// ポート番号の取得
 	port := os.Getenv("PORT")

@@ -13,7 +13,7 @@ const UserForm: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/users",
+        "http://localhost:8080/users/create",
         {
           name,
           email,
