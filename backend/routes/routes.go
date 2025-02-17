@@ -12,5 +12,7 @@ func SetupRoutes(router *gin.Engine, controllers *controllers.Controllers) {
 	{
 		userRoutes.GET("", userController.GetAllUsers)
 		userRoutes.POST("/create", userController.CreateUser)
+		userRoutes.PUT("/update:id", userController.UpdateUser)
+		userRoutes.DELETE("/delete:id", userController.DeleteUser)
 	}
 }

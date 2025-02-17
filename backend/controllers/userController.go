@@ -4,6 +4,7 @@ import (
 	"backend/models"
 	"backend/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,4 +40,41 @@ func (ctrl *UserController) CreateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, createdUser)
+}
+
+// ユーザー更新
+func (ctrl *UserController) UpdateUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var input models.User
+
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+		return
+	}
+
+	user, err := ctrl.UserService.UpdateUser(parseUint(id), &input)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
+
+// ユーザー削除
+func (ctrl *UserController) DeleteUser(ctx *gin.Context) {
+	id := parseUint(ctx.Param("id"))
+
+	if err := ctrl.UserService.DeleteUser(id); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "ユーザーの削除に成功しました"})
+}
+
+// 文字列をuintに変換
+func parseUint(s string) uint {
+	id, _ := strconv.ParseUint(s, 10, 64)
+	return uint(id)
 }

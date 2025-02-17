@@ -31,13 +31,24 @@ func (service *UserService) CreateUser(user *models.User) (*models.User, error) 
 }
 
 // 更新
-func (service *UserService) UpdateUser(user *models.User) (*models.User, error) {
-	result := service.DB.Save(&user)
-	return user, result.Error
+func (service *UserService) UpdateUser(id uint, updatedUser *models.User) (*models.User, error) {
+	var user models.User
+	if err := service.DB.First(&user, id).Error; err != nil {
+		return updatedUser, err
+	}
+
+	if err := service.DB.Model(&user).Updates(updatedUser).Error; err != nil {
+		return updatedUser, err
+	}
+
+	return updatedUser, nil
 }
 
 // 削除
 func (service *UserService) DeleteUser(id uint) error {
-	result := service.DB.Delete(&models.User{}, id)
-	return result.Error
+	if err := service.DB.Delete(&models.User{}, id).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
