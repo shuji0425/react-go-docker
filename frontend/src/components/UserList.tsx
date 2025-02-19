@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "../types/user";
+import UserUpdateForm from "./UserUpdateForm";
 
 const UserList: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
@@ -21,17 +23,9 @@ const UserList: React.FC = () => {
   };
 
   // ユーザー更新
-  const updateUser = async (id: number, updateData: Partial<User>) => {
-    try {
-      const response = await axios.put<User>(
-        `http://localhost:8080/users/update${id}`,
-        updateData
-      );
-      setUsers(users.map((user) => (user.id === id ? response.data : user)));
-      alert("ユーザーを更新しました");
-    } catch (error) {
-      console.error("ユーザー更新失敗:", error);
-    }
+  const handleUpdateSuccess = () => {
+    fetchUsers();
+    setEditingUser(null);
   };
 
   // ユーザー削除
@@ -56,22 +50,17 @@ const UserList: React.FC = () => {
   return (
     <div>
       <h1>ユーザー一覧</h1>
-      {users.length === 0 ? (
-        <p>ユーザーを登録してください</p>
+      {editingUser ? (
+        <UserUpdateForm
+          user={editingUser}
+          onUpdateSuccess={handleUpdateSuccess}
+        />
       ) : (
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              Name: {user.name} <br />
-              Age: {user.age} years old <br />
-              Email:{user.email}
-              <button
-                onClick={() =>
-                  updateUser(user.id, { name: "更新済みユーザー", age: user.age, email: user.email })
-                }
-              >
-                更新
-              </button>
+              {user.name} ({user.email}) - {user.age ?? "年齢未設定"}
+              <button onClick={() => setEditingUser(user)}>編集</button>
               <button onClick={() => deleteUser(user.id)}>削除</button>
             </li>
           ))}

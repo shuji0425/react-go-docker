@@ -2,7 +2,9 @@ package services
 
 import (
 	"backend/models"
+	"errors"
 
+	"github.com/mitchellh/mapstructure"
 	"gorm.io/gorm"
 )
 
@@ -31,17 +33,23 @@ func (service *UserService) CreateUser(user *models.User) (*models.User, error) 
 }
 
 // 更新
-func (service *UserService) UpdateUser(id uint, updatedUser *models.User) (*models.User, error) {
+func (service *UserService) UpdateUser(id uint, updatedUser map[string]interface{}) (*models.User, error) {
 	var user models.User
 	if err := service.DB.First(&user, id).Error; err != nil {
-		return updatedUser, err
+		return nil, err
+	}
+
+	// データのマッピング
+	var tempUser models.User
+	if err := mapstructure.Decode(updatedUser, &tempUser); err != nil {
+		return nil, errors.New("データのマッピングに失敗しました")
 	}
 
 	if err := service.DB.Model(&user).Updates(updatedUser).Error; err != nil {
-		return updatedUser, err
+		return nil, err
 	}
 
-	return updatedUser, nil
+	return &user, nil
 }
 
 // 削除

@@ -45,14 +45,14 @@ func (ctrl *UserController) CreateUser(ctx *gin.Context) {
 // ユーザー更新
 func (ctrl *UserController) UpdateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var input models.User
+	var input map[string]interface{}
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
 		return
 	}
 
-	user, err := ctrl.UserService.UpdateUser(parseUint(id), &input)
+	user, err := ctrl.UserService.UpdateUser(parseUint(id), input)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
