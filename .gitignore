@@ -1,3 +1,8 @@
+# 一時ファイル形
+/tmp/
+*.log
+*.out
+
 node_modules/
 dist/
 .env
